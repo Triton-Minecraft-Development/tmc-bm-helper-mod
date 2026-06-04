@@ -50,9 +50,10 @@ It emulates the raid thing.
 | Item | Name |
 |------|------|
 | Objective | `tmc.dev.bossbar_mode` |
+| Objective | `tmc.dev.bossbar_enabled` |
 | Holder (fake player) | `#tmc.dev.bossbar` |
 
-On first setup, the mod sets the score to **1** (**ready**).
+On first setup, the mod sets the mode to **1** (**ready**), and enabled to **0** (**disabled**).
 
 ### Switching modes manually
 
