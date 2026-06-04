@@ -38,7 +38,7 @@ public class BossbarPlayerTick {
 
         server.getCommandManager().parseAndExecute(
                 source,
-                "bossbar set tmc.dev.wave_health players @a"
+                "execute if score #tmc.dev.bossbar tmc.dev.bossbar_enabled matches 1 run bossbar set tmc.dev.wave_health players @a"
         );
     }
 }
