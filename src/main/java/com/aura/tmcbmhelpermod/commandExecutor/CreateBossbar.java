@@ -25,6 +25,8 @@ public class CreateBossbar {
                 source,
                 "scoreboard players set " + BossbarMode.SCORE_HOLDER + " " + BossbarMode.OBJECTIVE + " " + BossbarMode.READY.getScore()
         );
+        server.getCommandManager().parseAndExecute(source, "scoreboard objectives add tmc.dev.bossbar_enabled dummy");
+        server.getCommandManager().parseAndExecute(source, "scoreboard players set #tmc.dev.bossbar tmc.dev.bossbar_enabled 0");
     }
 
 }
