@@ -1,5 +1,8 @@
 package com.aura.tmcbmhelpermod.commandExecutor;
 
+import net.minecraft.scoreboard.ScoreHolder;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -13,6 +16,7 @@ import java.util.UUID;
 public class BossbarPlayerTick {
 
     private static final Set<UUID> lastPlayers = new HashSet<>();
+    private static boolean lastEnabledState = false;
 
     public static void execute(ServerWorld world) {
         MinecraftServer server = world.getServer();
@@ -24,21 +28,41 @@ public class BossbarPlayerTick {
             currentPlayers.add(player.getUuid());
         }
 
-        // only run command if something actually changed
-        if (currentPlayers.equals(lastPlayers)) {
+        // read sb value
+        boolean enabled = isBossbarEnabled(server);
+
+        // proceed if smth changed
+        if (currentPlayers.equals(lastPlayers) && enabled == lastEnabledState) {
             return;
         }
 
         lastPlayers.clear();
         lastPlayers.addAll(currentPlayers);
+        lastEnabledState = enabled;
 
         ServerCommandSource source = server.getCommandSource()
                 .withWorld(world)
                 .withPosition(new Vec3d(0, 0, 0));
 
-        server.getCommandManager().parseAndExecute(
-                source,
-                "execute if score #tmc.dev.bossbar tmc.dev.bossbar_enabled matches 1 run bossbar set tmc.dev.wave_health players @a"
-        );
+        if (enabled) {
+            server.getCommandManager().parseAndExecute(
+                    source,
+                    "bossbar set tmc.dev.wave_health players @a"
+            );
+        } else {
+            server.getCommandManager().parseAndExecute(
+                    source,
+                    "bossbar set tmc.dev.wave_health players"
+            );
+        }
+    }
+
+    private static boolean isBossbarEnabled(MinecraftServer server) {
+        Scoreboard scoreboard = server.getScoreboard();
+        ScoreboardObjective objective = scoreboard.getNullableObjective("tmc.dev.bossbar_enabled");
+
+        if (objective == null) return false;
+
+        return scoreboard.getOrCreateScore(ScoreHolder.fromName("#tmc.dev.bossbar"), objective).getScore() == 1;
     }
 }
