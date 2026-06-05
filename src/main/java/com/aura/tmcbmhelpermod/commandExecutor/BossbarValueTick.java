@@ -4,7 +4,7 @@ import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.server.MinecraftServer;
 
 public class BossbarValueTick {
-    private static final int CHARGE_INCREMENT = 1;
+    private static final int CHARGE_TICKS = 100;
 
     private static int lastValue = Integer.MIN_VALUE;
 
@@ -22,10 +22,11 @@ public class BossbarValueTick {
             case CHARGING -> {
                 int current = bar.getValue();
                 int max = bar.getMaxValue();
-                if (current >= max) {
+                if (current >= max || max == 0) {
                     yield current;
                 }
-                yield Math.min(current + CHARGE_INCREMENT, max);
+                int increment = Math.max(1, (max + CHARGE_TICKS - 1) / CHARGE_TICKS);
+                yield Math.min(current + increment, max);
             }
         };
 
